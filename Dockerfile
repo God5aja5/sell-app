@@ -1,26 +1,32 @@
-FROM python:3.10
+# Use an official Python slim image
+FROM python:3.11-slim
 
-# Install system dependencies
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (Chromium + Chromedriver)
 RUN apt-get update && apt-get install -y \
-    wget unzip curl gnupg \
     chromium \
     chromium-driver \
+    wget \
+    curl \
+    unzip \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for Chrome
-ENV DISPLAY=:99
-ENV CHROME_BIN=/usr/bin/chromium
-ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
-
-# Copy project files
-WORKDIR /app
-COPY . .
-
-# Install Python dependencies
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port (Render uses PORT env)
+# Copy application code
+COPY . .
+
+# Expose Render/Railway port
 EXPOSE 5000
 
-# Start Gunicorn using shell form so $PORT expands
-CMD gunicorn app:app --bind 0.0.0.0:$PORT
+# Run the Flask app
+CMD ["python3", "app.py"]
