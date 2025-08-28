@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
 import time, random, json, re, os
 
 app = Flask(__name__)
@@ -18,10 +19,12 @@ def run_selenium_task():
     options.add_argument("--disable-dev-shm-usage")
     options.binary_location = "/usr/bin/chromium"
 
-    driver = webdriver.Chrome(executable_path="/usr/bin/chromedriver", options=options)
+    # Use Service instead of executable_path
+    service = Service("/usr/bin/chromedriver")
+    driver = webdriver.Chrome(service=service, options=options)
 
     driver.get("https://workik.com/ai-code-generator")
-    time.sleep(6)  # wait for page load
+    time.sleep(6)
     actions = ActionChains(driver)
 
     # Step 1: Select model
@@ -57,7 +60,7 @@ def run_selenium_task():
             EC.element_to_be_clickable((By.CSS_SELECTOR, "button.MuiButtonBase-root.css-11uhnn1"))
         )
         send_btn.click()
-        time.sleep(10)  # wait for request
+        time.sleep(10)
 
         # Capture logs
         logs = driver.get_log("performance")
