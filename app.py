@@ -9,6 +9,10 @@ import time, random, json, re, os
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return jsonify({"message": "Welcome! Use /<task_id> to run Selenium task."})
+
 def run_selenium_task():
     # Chrome options
     options = webdriver.ChromeOptions()
